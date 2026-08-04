@@ -1,7 +1,7 @@
 /**
  * Generate demo bank / income / expense samples from ledger.json.
  *
- * Usage: bun run samples
+ * Usage: npm run samples
  * Output: public/samples/{bank.pdf,bank.txt,income.csv,expense.csv,README.md}
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises"
@@ -168,7 +168,7 @@ bank-only, report-only, date too far (±3), amount too far.
 Regenerate:
 
 \`\`\`sh
-bun run samples
+npm run samples
 \`\`\`
 `
   await writeFile(path.join(outDir, "README.md"), readme, "utf8")

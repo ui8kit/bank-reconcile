@@ -4,18 +4,21 @@
 bank PDF + income/expense reports, then ask an LLM (or edit by hand) to adapt
 the parser to that layout.
 
-- Bun + Svelte 5 + Vite (static, Vercel-ready)
+- Svelte 5 + Vite (static, Vercel-ready)
+- Install with **npm** or **Bun** (Node ≥ 20)
 - No OCR, no server upload, no IndexedDB — everything stays in the tab
 - Fuzzy match: amount ±0.05, date ±1 day, purpose text overlap
 
 ## Quick start
 
 ```sh
-bun install
-bun run dev      # http://127.0.0.1:5180  ·  /docs/
-bun test
-bun run build  # dist/ + dist/docs/
+npm install
+npm run dev      # http://127.0.0.1:5180  ·  /docs/
+npm test
+npm run build   # dist/ + dist/docs/
 ```
+
+Same scripts work with Bun if you prefer (`bun install` / `bun run …`).
 
 Try fixtures first:
 
@@ -28,8 +31,8 @@ Try fixtures first:
 
 1. Put your statement + reports under `public/examples/` (or any local folder).
 2. Open this repo in Cursor / your agent and paste a prompt like the one below.
-3. Reload `bun run dev`, upload the three files, check unmatched lists.
-4. Deploy `bun run build` to Vercel when it looks right.
+3. Reload `npm run dev`, upload the three files, check unmatched lists.
+4. Deploy `npm run build` to Vercel when it looks right.
 
 ### Prompt you can copy
 
@@ -51,8 +54,8 @@ Workflow:
 1) Extract/dump text from the PDF (pdf.ts / pdfjs) and show a few sample lines.
 2) Adjust parse.ts (and pdf.ts if columns/wrapping differ) until amounts are the
    operation amounts — not running balance — and purpose includes wrapped lines.
-3) Add a small bun test with 2–3 golden lines from this statement.
-4) Run bun test && bun run build.
+3) Add a small vitest case with 2–3 golden lines from this statement.
+4) Run npm test && npm run build.
 ```
 
 Read **[AGENTS.md](AGENTS.md)** for where to change code and what not to touch.
@@ -60,9 +63,10 @@ Read **[AGENTS.md](AGENTS.md)** for where to change code and what not to touch.
 ## Scripts
 
 ```sh
-bun run samples      # regenerate public/samples from ledger.json
-bun run sync:ui8kit  # refresh vendored ui8kit (do not hand-edit kit)
-bun run check        # tsc + svelte-check
+npm run samples      # regenerate public/samples from ledger.json
+npm run sync:ui8kit  # refresh vendored ui8kit (do not hand-edit kit)
+npm run check        # tsc + svelte-check
+npm run test:watch   # vitest watch mode
 ```
 
 ## Docs / deploy

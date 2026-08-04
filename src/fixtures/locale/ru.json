@@ -56,9 +56,9 @@
   "docsPromptBody": "Склонируйте стартер, положите выписку и отчёты в public/examples/, затем вставьте промпт ниже в Cursor (или другого агента). Менять нужно parse/pdf — без бэкенда.",
   "docsPromptTip1": "Назовите файлы явно (например public/examples/my-bank.pdf).",
   "docsPromptTip2": "Попросите агента сначала вывести несколько строк текста PDF, потом починить сумму vs остаток.",
-  "docsPromptTip3": "Требуйте bun test && bun run build, прежде чем доверять результату.",
+  "docsPromptTip3": "Требуйте npm test && npm run build, прежде чем доверять результату.",
   "docsPromptCopy": "Скопировать промпт",
   "docsPromptCopied": "Скопировано",
-  "docsPrompt": "Прочитай AGENTS.md. Адаптируй этот стартер под мою банковскую выписку.\n\nВыписка: public/examples/<my-bank>.pdf\nДоходы:  public/examples/income.csv\nРасходы: public/examples/expense.csv\n\nСделай так, чтобы parse/pdf извлекали верные date, сумму операции (не остаток) и purpose (включая переносы строк). Правила match.ts не ломай. Оставайся browser-only.\nДобавь bun-тесты на несколько строк из этого PDF. Запусти bun test && bun run build.",
+  "docsPrompt": "Прочитай AGENTS.md. Адаптируй этот стартер под мою банковскую выписку.\n\nВыписка: public/examples/<my-bank>.pdf\nДоходы:  public/examples/income.csv\nРасходы: public/examples/expense.csv\n\nСделай так, чтобы parse/pdf извлекали верные date, сумму операции (не остаток) и purpose (включая переносы строк). Правила match.ts не ломай. Оставайся browser-only.\nДобавь vitest-кейсы на несколько строк из этого PDF. Запусти npm test && npm run build.",
   "docsBack": "← К сверке"
 }

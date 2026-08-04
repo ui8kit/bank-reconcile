@@ -21,5 +21,5 @@ bank-only, report-only, date too far (±3), amount too far.
 Regenerate:
 
 ```sh
-bun run samples
+npm run samples
 ```

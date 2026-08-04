@@ -30,8 +30,8 @@ parsing so Match works for that layout.
      `pickOperationAmount` / CSV headers
    - optional: `loadLedgerFile` in `index.ts` if file type routing changes
 4. **Do not** rewrite the UI, matcher defaults, or add a server unless asked.
-5. **Prove** with `bun test` (add 2–3 golden lines from the new statement) and
-   `bun run build`. Manually: `bun run dev` → upload 3 files → check unmatched.
+5. **Prove** with `npm test` (add 2–3 golden lines from the new statement) and
+   `npm run build`. Manually: `npm run dev` → upload 3 files → check unmatched.
 
 ### Copy-paste prompt (for the human)
 
@@ -44,7 +44,7 @@ Expense:   public/examples/expense.csv
 
 Make parse/pdf extract correct date, operation amount (not balance), and purpose
 (including wrapped lines). Keep match.ts fuzzy rules. Stay browser-only.
-Add bun tests for a few lines from this PDF. Run bun test && bun run build.
+Add vitest cases for a few lines from this PDF. Run npm test && npm run build.
 ```
 
 ### Good vs bad adaptations
@@ -59,7 +59,8 @@ Add bun tests for a few lines from this PDF. Run bun test && bun run build.
 
 ## Stack
 
-- **Bun ≥ 1.3** · **Svelte 5** · **Vite 6** MPA (`/` + `/docs`)
+- **Node ≥ 20** (npm) or **Bun ≥ 1.3** — same scripts
+- **Svelte 5** · **Vite 6** MPA (`/` + `/docs`) · **Vitest** for unit tests
 - **Tailwind v4** + `src/theme.css` · self-hosted **Google Sans** in `public/fonts/`
 - **pdfjs-dist** in-browser · **ui8kit** vendored in `src/lib/ui8kit/` (codegen)
 
@@ -67,12 +68,13 @@ Add bun tests for a few lines from this PDF. Run bun test && bun run build.
 
 | Action | Command |
 |--------|---------|
-| Dev | `bun run dev` → `:5180` and `/docs/` |
-| Tests | `bun test` |
-| Check | `bun run check` |
-| Build | `bun run build` → `dist/` + `dist/docs/` |
-| Demo samples | `bun run samples` |
-| Sync ui8kit | `bun run sync:ui8kit` |
+| Install | `npm install` (or `bun install`) |
+| Dev | `npm run dev` → `:5180` and `/docs/` |
+| Tests | `npm test` |
+| Check | `npm run check` |
+| Build | `npm run build` → `dist/` + `dist/docs/` |
+| Demo samples | `npm run samples` |
+| Sync ui8kit | `npm run sync:ui8kit` |
 
 ## Repo map
 
@@ -121,7 +123,7 @@ Matcher (`match.ts`) pairs bank ↔ income/expense with defaults:
 ## Definition of done (bank adaptation)
 
 - [ ] Sample lines from the new PDF parse to correct `date` / `amount` / `purpose`
-- [ ] `bun test` green (including new golden cases)
-- [ ] `bun run build` green
+- [ ] `npm test` green (including new golden cases)
+- [ ] `npm run build` green
 - [ ] Manual Match in UI: expected matched + unmatched make sense
 - [ ] No new backend, storage, or remote font CDN

@@ -3,15 +3,19 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Browser-only bank statement reconciler (Bun + Svelte 5 + ui8kit).",
+  "description": "Browser-only bank statement reconciler (Svelte 5 + Vite + ui8kit). Works with npm or Bun.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "sync:ui8kit": "bash ./scripts/sync-ui8kit.sh",
     "check": "tsc -p tsconfig.json --noEmit && svelte-check --tsconfig ./tsconfig.json",
-    "test": "bun test",
-    "samples": "bun run ./scripts/generate-samples.ts"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "samples": "tsx ./scripts/generate-samples.ts"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -29,8 +33,9 @@
     "svelte": "^5.19.0",
     "svelte-check": "^4.1.4",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.2",
-    "vite": "^6.2.0"
-  },
-  "packageManager": "bun@1.3.3"
+    "vite": "^6.2.0",
+    "vitest": "^3.2.4"
+  }
 }
