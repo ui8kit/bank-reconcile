@@ -300,20 +300,22 @@
   }
 
   .page--docs {
-    @apply items-stretch;
+    @apply items-center;
   }
 
   .page--docs .page__stack {
     justify-content: flex-start;
     padding-top: 0.5rem;
+    max-width: min(40rem, 100%);
+    margin-inline: auto;
   }
 
   .docs {
-    @apply gap-5;
+    @apply gap-5 w-full;
   }
 
   .docs__section {
-    @apply grid gap-2 text-left;
+    @apply grid gap-2 text-left w-full;
   }
 
   .docs__h {
@@ -335,6 +337,10 @@
     line-height: 1.45;
   }
 
+  .docs__list--tips {
+    @apply mb-1;
+  }
+
   .docs__links {
     @apply m-0 pl-5 grid gap-2;
     font-size: var(--fs-body);
@@ -347,6 +353,28 @@
   .docs__hint {
     @apply text-muted-foreground;
     font-size: var(--fs-hint);
+  }
+
+  .docs__prompt {
+    @apply relative grid gap-2 rounded-lg border border-border bg-card p-3 shadow-xs;
+  }
+
+  .docs__prompt-code {
+    margin: 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: var(--fs-hint);
+    line-height: 1.45;
+    @apply text-card-foreground;
+  }
+
+  .docs__prompt-copy {
+    @apply justify-self-start appearance-none cursor-pointer rounded-md border border-border bg-secondary px-3 py-1.5 text-secondary-foreground hover:bg-secondary/80;
+    font: inherit;
+    font-size: var(--fs-hint);
+    font-weight: 600;
   }
 
   .docs__back {

@@ -42,6 +42,22 @@
     locale = nextLocale(locale)
     storeLocale(locale)
   }
+
+  let copied = $state(false)
+  let copyTimer: ReturnType<typeof setTimeout> | null = null
+
+  async function copyPrompt() {
+    try {
+      await navigator.clipboard.writeText(t.docsPrompt)
+      copied = true
+      if (copyTimer) clearTimeout(copyTimer)
+      copyTimer = setTimeout(() => {
+        copied = false
+      }, 1600)
+    } catch {
+      copied = false
+    }
+  }
 </script>
 
 <div class="shell">
@@ -122,6 +138,26 @@
             <span class="docs__hint">{t.docsExamplesHint}</span>
           </li>
         </ul>
+      </section>
+
+      <section class="docs__section">
+        <h2 class="docs__h">{t.docsPromptTitle}</h2>
+        <p class="docs__p">{t.docsPromptBody}</p>
+        <ul class="docs__list docs__list--tips">
+          <li>{t.docsPromptTip1}</li>
+          <li>{t.docsPromptTip2}</li>
+          <li>{t.docsPromptTip3}</li>
+        </ul>
+        <div class="docs__prompt">
+          <pre class="docs__prompt-code">{t.docsPrompt}</pre>
+          <button
+            type="button"
+            class="docs__prompt-copy"
+            onclick={copyPrompt}
+          >
+            {copied ? t.docsPromptCopied : t.docsPromptCopy}
+          </button>
+        </div>
       </section>
 
       <p class="docs__back">

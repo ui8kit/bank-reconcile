@@ -52,5 +52,13 @@
   "docsSamplesBody": "Ready-made fixtures live in the repository. Download them, then upload in the app.",
   "docsSamplesHint": "— synthetic demo (known expected unmatched counts)",
   "docsExamplesHint": "— real Promsvyazbank PDF + aligned reports",
+  "docsPromptTitle": "Adapt to your bank (LLM prompt)",
+  "docsPromptBody": "Clone this starter, put your statement and reports under public/examples/, then paste the prompt below into Cursor (or any coding agent). It should only touch parse/pdf — not add a backend.",
+  "docsPromptTip1": "Name your files clearly (e.g. public/examples/my-bank.pdf).",
+  "docsPromptTip2": "Ask the agent to dump a few PDF text lines first, then fix amount vs balance.",
+  "docsPromptTip3": "Require bun test && bun run build before you trust the result.",
+  "docsPromptCopy": "Copy prompt",
+  "docsPromptCopied": "Copied",
+  "docsPrompt": "Read AGENTS.md. Adapt this starter to my bank statement.\n\nStatement: public/examples/<my-bank>.pdf\nIncome:    public/examples/income.csv\nExpense:   public/examples/expense.csv\n\nMake parse/pdf extract correct date, operation amount (not running balance), and purpose (including wrapped lines). Keep match.ts fuzzy rules. Stay browser-only.\nAdd bun tests for a few lines from this PDF. Run bun test && bun run build.",
   "docsBack": "← Back to app"
 }
