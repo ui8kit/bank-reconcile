@@ -1,3 +1,4 @@
+@import "./fonts.css";
 @import "./theme.css";
 
 @layer base {
@@ -265,7 +266,7 @@
   }
 
   .site-footer {
-    @apply grid justify-items-center gap-1.5 text-center w-full shrink-0;
+    @apply grid justify-items-center gap-2 text-center w-full shrink-0;
     max-width: var(--stack-max);
     margin-top: clamp(1.25rem, 1rem + 1.5vw, 2rem);
     padding-top: 0.75rem;
@@ -273,16 +274,84 @@
 
   .site-footer__note {
     margin: 0;
-    max-width: 22rem;
+    max-width: 24rem;
     font-size: var(--fs-footer);
     line-height: 1.45;
     @apply text-muted-foreground/80;
   }
 
-  .site-footer__clear {
-    @apply appearance-none border-0 bg-transparent p-0 cursor-pointer text-muted-foreground underline-offset-2 hover:text-foreground hover:underline;
-    font: inherit;
+  .site-footer__made {
+    margin: 0;
+    @apply inline-flex flex-wrap items-center justify-center gap-1 text-muted-foreground;
     font-size: var(--fs-footer);
+    line-height: 1.3;
+  }
+
+  .site-footer__heart {
+    @apply text-primary shrink-0;
+  }
+
+  .site-footer__sep {
+    @apply opacity-50 px-0.5;
+  }
+
+  .site-footer__link {
+    @apply text-foreground/90 underline-offset-2 hover:text-primary hover:underline;
+  }
+
+  .page--docs {
+    @apply items-stretch;
+  }
+
+  .page--docs .page__stack {
+    justify-content: flex-start;
+    padding-top: 0.5rem;
+  }
+
+  .docs {
+    @apply gap-5;
+  }
+
+  .docs__section {
+    @apply grid gap-2 text-left;
+  }
+
+  .docs__h {
+    margin: 0;
+    font-size: var(--fs-body);
+    @apply font-semibold;
+  }
+
+  .docs__p {
+    margin: 0;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    @apply text-muted-foreground;
+  }
+
+  .docs__list {
+    @apply m-0 pl-5 grid gap-1.5;
+    font-size: var(--fs-body);
+    line-height: 1.45;
+  }
+
+  .docs__links {
+    @apply m-0 pl-5 grid gap-2;
+    font-size: var(--fs-body);
+  }
+
+  .docs__link {
+    @apply text-primary underline-offset-2 hover:underline font-medium;
+  }
+
+  .docs__hint {
+    @apply text-muted-foreground;
+    font-size: var(--fs-hint);
+  }
+
+  .docs__back {
+    @apply m-0 pt-1 text-center;
+    font-size: var(--fs-body);
   }
 
   @media (max-width: 374px) {

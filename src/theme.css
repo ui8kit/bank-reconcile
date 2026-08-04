@@ -35,7 +35,7 @@
   --sidebar-accent-foreground: hsl(24.0000 100% 97.0588%);
   --sidebar-border: hsl(214.2857 31.8182% 91.3725%);
   --sidebar-ring: hsl(214.4262 100.0000% 11.9608%);
-  --font-sans: Poppins, system-ui, sans-serif;
+  --font-sans: "Google Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.5rem;
@@ -90,7 +90,7 @@
   --sidebar-accent-foreground: hsl(210 23.7288% 23.1373%);
   --sidebar-border: hsl(217.2414 32.5843% 17.4510%);
   --sidebar-ring: hsl(24.8908 100.0000% 55.0980%);
-  --font-sans: Poppins, system-ui, sans-serif;
+  --font-sans: "Google Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: 0.5rem;
@@ -175,7 +175,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
     letter-spacing: var(--tracking-normal);
   }
 }

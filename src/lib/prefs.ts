@@ -1,6 +1,9 @@
 const THEME_KEY = "bank-theme"
 const LOCALE_KEY = "bank-locale"
 
+/** Fresh visits default to English; stored preference wins after first toggle. */
+export const DEFAULT_LOCALE = "en" as const
+
 export type ThemeMode = "light" | "dark"
 
 export function readStoredTheme(fallback: ThemeMode = "dark"): ThemeMode {
@@ -21,7 +24,9 @@ export function applyTheme(mode: ThemeMode) {
   }
 }
 
-export function readStoredLocale(fallback: "en" | "ru" = "en"): "en" | "ru" {
+export function readStoredLocale(
+  fallback: "en" | "ru" = DEFAULT_LOCALE,
+): "en" | "ru" {
   try {
     const v = localStorage.getItem(LOCALE_KEY)
     return v === "en" || v === "ru" ? v : fallback

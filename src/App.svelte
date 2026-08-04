@@ -4,6 +4,7 @@
   import Badge from "$lib/ui8kit/ui/badge/Badge.svelte"
   import Button from "$lib/ui8kit/ui/button/Button.svelte"
   import Text from "$lib/ui8kit/ui/text/Text.svelte"
+  import SiteFooter from "$lib/components/SiteFooter.svelte"
   import {
     downloadUnmatchedCsv,
     runReconcile,
@@ -38,7 +39,7 @@
   onMount(() => {
     theme = readStoredTheme("dark")
     applyTheme(theme)
-    locale = readStoredLocale("en")
+    locale = readStoredLocale()
     storeLocale(locale)
   })
 
@@ -237,9 +238,15 @@
       </ol>
 
       <div class="actions">
-        <Button variant="default" size="default" disabled={!canRun} onclick={onMatch}>
-          {busy ? t.matching : t.match}
-        </Button>
+        {#if hasResults}
+          <Button variant="destructive" size="default" onclick={clearBrowser}>
+            {t.clear}
+          </Button>
+        {:else}
+          <Button variant="default" size="default" disabled={!canRun} onclick={onMatch}>
+            {busy ? t.matching : t.match}
+          </Button>
+        {/if}
         <Button
           variant="outline"
           size="default"
@@ -301,11 +308,11 @@
       {/if}
     </div>
 
-    <footer class="site-footer">
-      <p class="site-footer__note">{t.privacyNote}</p>
-      <button type="button" class="site-footer__clear" onclick={clearBrowser}>
-        {t.clearBrowser}
-      </button>
-    </footer>
+    <SiteFooter
+      privacyNote={t.privacyNote}
+      madeWith={t.madeWith}
+      madeIn={t.madeIn}
+      docsLabel={t.docsLabel}
+    />
   </main>
 </div>

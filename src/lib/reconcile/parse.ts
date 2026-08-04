@@ -2,10 +2,14 @@ import type { LedgerRow, LedgerSide } from "./types"
 
 const DATE_RE =
   /(\d{2})[./-](\d{2})[./-](\d{4})|(\d{4})[./-](\d{2})[./-](\d{2})/
+const START_DATE_RE = /^(\d{2})[./-](\d{2})[./-](\d{4})/
 // Russian / EU amounts: 1 234,56 or 1234.56 or -1.234,56
 // Do not start after letters/digits/№/# (avoids "акт№18 125 000,00" → 18125000).
 const AMOUNT_RE =
   /(?<![A-Za-z0-9№#])([+-]?\d{1,3}(?:[ \u00a0]\d{3})*(?:[.,]\d{2})|[+-]?\d+[.,]\d{2}|[+-]?\d+)(?!\d)/g
+
+const SKIP_LINE_RE =
+  /формирования\s+выписки|за\s+период|входящий\s+остаток|исходящий\s+остаток|^(итого|приход|расход)(?:\s*:|\s|$)/i
 
 export function parseAmount(raw: string): number | null {
   let s = raw.trim().replace(/\u00a0/g, " ").replace(/\s+/g, "")
@@ -60,6 +64,58 @@ function extractPurpose(line: string, dateRaw: string, amountRaw: string): strin
 }
 
 /**
+ * Join wrapped bank-statement purpose lines into the preceding dated row.
+ */
+export function coalesceStatementLines(text: string): string[] {
+  const out: string[] = []
+  for (const raw of text.split(/\r?\n/)) {
+    const line = raw.trim().replace(/\s+/g, " ")
+    if (!line) continue
+    if (START_DATE_RE.test(line) || out.length === 0) {
+      out.push(line)
+      continue
+    }
+    if (SKIP_LINE_RE.test(line)) {
+      out.push(line)
+      continue
+    }
+    out[out.length - 1] = `${out[out.length - 1]} ${line}`
+  }
+  return out
+}
+
+function collectAmounts(withoutDate: string): Array<{ raw: string; value: number; index: number }> {
+  const amounts: Array<{ raw: string; value: number; index: number }> = []
+  AMOUNT_RE.lastIndex = 0
+  let m: RegExpExecArray | null
+  while ((m = AMOUNT_RE.exec(withoutDate)) !== null) {
+    const raw = m[1]!
+    const value = parseAmount(raw)
+    if (value === null) continue
+    // skip years mistaken as amounts
+    if (value >= 1900 && value <= 2100 && !/[.,]/.test(raw)) continue
+    // skip payment-order / account-like integers
+    if (!/[.,]/.test(raw) && Math.abs(value) >= 1_000_000) continue
+    amounts.push({ raw, value, index: m.index })
+  }
+  return amounts
+}
+
+/**
+ * Pick operation amount. Bank tables often end with running balance —
+ * when several money amounts exist, use the first money-like value (credit/debit),
+ * not the trailing остаток.
+ */
+export function pickOperationAmount(
+  amounts: Array<{ raw: string; value: number; index: number }>,
+): { raw: string; value: number; index: number } | null {
+  if (amounts.length === 0) return null
+  const moneyLike = amounts.filter((a) => /[.,]\d{2}$/.test(a.raw))
+  if (moneyLike.length >= 1) return moneyLike[0]!
+  return amounts[amounts.length - 1]!
+}
+
+/**
  * Heuristic line parser for bank / report text dumps.
  * Keeps lines that contain both a date and an amount.
  */
@@ -68,13 +124,16 @@ export function rowsFromText(
   side: LedgerSide,
   sourceFile: string,
 ): LedgerRow[] {
-  const lines = text.split(/\r?\n/)
+  const lines = coalesceStatementLines(text)
   const rows: LedgerRow[] = []
   let i = 0
   for (const line of lines) {
     i += 1
     const trimmed = line.trim()
     if (trimmed.length < 8) continue
+    if (SKIP_LINE_RE.test(trimmed)) continue
+    if (!START_DATE_RE.test(trimmed)) continue
+
     const dateMatch = trimmed.match(DATE_RE)
     const date = parseDateToken(trimmed)
     if (!date || !dateMatch) continue
@@ -85,22 +144,9 @@ export function rowsFromText(
       " " +
       trimmed.slice((dateMatch.index ?? 0) + dateMatch[0].length)
 
-    const amounts: Array<{ raw: string; value: number; index: number }> = []
-    AMOUNT_RE.lastIndex = 0
-    let m: RegExpExecArray | null
-    while ((m = AMOUNT_RE.exec(withoutDate)) !== null) {
-      const value = parseAmount(m[1]!)
-      if (value === null) continue
-      // skip years mistaken as amounts
-      if (value >= 1900 && value <= 2100 && !/[.,]/.test(m[1]!)) continue
-      amounts.push({ raw: m[1]!, value, index: m.index })
-    }
-    if (amounts.length === 0) continue
-
-    // Prefer the rightmost money-looking amount (tables often end with sum).
-    const moneyLike = amounts.filter((a) => /[.,]\d{2}$/.test(a.raw))
-    const pool = moneyLike.length > 0 ? moneyLike : amounts
-    const pick = pool[pool.length - 1]!
+    const amounts = collectAmounts(withoutDate)
+    const pick = pickOperationAmount(amounts)
+    if (!pick) continue
 
     let amount = pick.value
     if (side === "expense" && amount > 0) amount = -Math.abs(amount)
