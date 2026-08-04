@@ -1,0 +1,167 @@
+{
+  "meta": {
+    "title": "Demo bank reconcile samples",
+    "period": "2024-03",
+    "currency": "RUB",
+    "notes": [
+      "Source of truth for generated bank/income/expense samples.",
+      "expectMatch=true means bank + report should pair under default matcher (±1 day, ±0.05 amount, purpose overlap)."
+    ]
+  },
+  "payments": [
+    {
+      "id": "inc-exact",
+      "side": "income",
+      "case": "exact amount + same day + shared purpose tokens",
+      "expectMatch": true,
+      "bank": {
+        "date": "2024-03-05",
+        "amount": 125000,
+        "purpose": "Оплата по договору от ООО Ромашка по акту№18"
+      },
+      "report": {
+        "date": "2024-03-05",
+        "amount": 125000,
+        "purpose": "ООО Ромашка акт№18"
+      }
+    },
+    {
+      "id": "inc-date-plus1",
+      "side": "income",
+      "case": "report date = bank date + 1 day",
+      "expectMatch": true,
+      "bank": {
+        "date": "2024-03-11",
+        "amount": 48250.5,
+        "purpose": "Поступление от ИП Сидоров аренда склада"
+      },
+      "report": {
+        "date": "2024-03-12",
+        "amount": 48250.5,
+        "purpose": "ИП Сидоров аренда склада"
+      }
+    },
+    {
+      "id": "exp-amount-tol",
+      "side": "expense",
+      "case": "amount differs by 0.04 (within ±0.05)",
+      "expectMatch": true,
+      "bank": {
+        "date": "2024-03-08",
+        "amount": -15680,
+        "purpose": "Оплата поставщику ООО ТехСнаб по счету№441"
+      },
+      "report": {
+        "date": "2024-03-08",
+        "amount": -15679.96,
+        "purpose": "ООО ТехСнаб счет№441"
+      }
+    },
+    {
+      "id": "exp-date-minus1",
+      "side": "expense",
+      "case": "report date = bank date - 1 day",
+      "expectMatch": true,
+      "bank": {
+        "date": "2024-03-14",
+        "amount": -3200,
+        "purpose": "Комиссия за перевод зарплаты сотрудникам"
+      },
+      "report": {
+        "date": "2024-03-13",
+        "amount": -3200,
+        "purpose": "Комиссия перевод зарплаты"
+      }
+    },
+    {
+      "id": "inc-purpose-weak-ok",
+      "side": "income",
+      "case": "exact amount + same day + weak but overlapping purpose",
+      "expectMatch": true,
+      "bank": {
+        "date": "2024-03-18",
+        "amount": 9900,
+        "purpose": "Возврат аванса клиент Север"
+      },
+      "report": {
+        "date": "2024-03-18",
+        "amount": 9900,
+        "purpose": "Клиент Север возврат"
+      }
+    },
+    {
+      "id": "bank-only-fee",
+      "side": "expense",
+      "case": "only in bank statement — unmatched bank",
+      "expectMatch": false,
+      "bank": {
+        "date": "2024-03-20",
+        "amount": -150,
+        "purpose": "Плата за смс-информирование март"
+      },
+      "report": null
+    },
+    {
+      "id": "income-only",
+      "side": "income",
+      "case": "only in income report — unmatched income",
+      "expectMatch": false,
+      "bank": null,
+      "report": {
+        "date": "2024-03-22",
+        "amount": 15000,
+        "purpose": "Ошибочно заведённый приход без банка"
+      }
+    },
+    {
+      "id": "expense-only",
+      "side": "expense",
+      "case": "only in expense report — unmatched expense",
+      "expectMatch": false,
+      "bank": null,
+      "report": {
+        "date": "2024-03-21",
+        "amount": -7700,
+        "purpose": "Черновик расхода без банковской оплаты"
+      }
+    },
+    {
+      "id": "date-too-far",
+      "side": "income",
+      "case": "same amount/purpose but date ±3 days — should NOT match",
+      "expectMatch": false,
+      "bank": {
+        "date": "2024-03-01",
+        "amount": 50000,
+        "purpose": "Оплата от ООО Вектор по счету№77"
+      },
+      "report": {
+        "date": "2024-03-04",
+        "amount": 50000,
+        "purpose": "ООО Вектор счет№77"
+      }
+    },
+    {
+      "id": "amount-too-far",
+      "side": "expense",
+      "case": "same day/purpose but amount off by 500 — should NOT match",
+      "expectMatch": false,
+      "bank": {
+        "date": "2024-03-25",
+        "amount": -8400,
+        "purpose": "Оплата хостинга CloudHost тариф Pro"
+      },
+      "report": {
+        "date": "2024-03-25",
+        "amount": -8900,
+        "purpose": "CloudHost тариф Pro"
+      }
+    }
+  ],
+  "expect": {
+    "matched": 5,
+    "unmatchedBank": 3,
+    "unmatchedIncome": 2,
+    "unmatchedExpense": 2
+  }
+}

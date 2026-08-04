@@ -1,0 +1,11 @@
+# Build
+dist/
+node_modules/
+
+# Local
+.env
+.env.*
+*.log
+.DS_Store
+playwright-report/
+test-results/

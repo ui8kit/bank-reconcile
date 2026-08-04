@@ -1,0 +1,326 @@
+@import "./theme.css";
+
+@layer base {
+  :root {
+    /* Fluid type: iPhone 5S (320) → tablet portrait (768) → desktop */
+    --fs-base: clamp(0.8125rem, 0.7rem + 0.55vw, 1rem);
+    --fs-title: clamp(1.2rem, 0.85rem + 2.4vw, 1.875rem);
+    --fs-lead: clamp(0.8125rem, 0.72rem + 0.5vw, 1.0625rem);
+    --fs-label: clamp(0.6875rem, 0.62rem + 0.35vw, 0.8125rem);
+    --fs-body: clamp(0.75rem, 0.68rem + 0.4vw, 0.9375rem);
+    --fs-hint: clamp(0.625rem, 0.58rem + 0.22vw, 0.72rem);
+    --fs-footer: clamp(0.6875rem, 0.62rem + 0.28vw, 0.8125rem);
+    --space-page-x: clamp(0.75rem, 0.4rem + 2.5vw, 1.5rem);
+    --space-page-y: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+    --space-section: clamp(1.25rem, 1rem + 1.2vw, 2rem);
+    --stack-max: min(26rem, 100%);
+    --chrome-safe: 3.25rem;
+    font-size: var(--fs-base);
+  }
+
+  @media (max-width: 374px) {
+    :root {
+      --fs-base: 0.78rem;
+      --fs-title: 1.15rem;
+      --fs-lead: 0.8rem;
+      --fs-label: 0.65rem;
+      --fs-body: 0.72rem;
+      --fs-hint: 0.58rem;
+      --fs-footer: 0.6875rem;
+      --space-page-x: 0.65rem;
+      --space-section: 1.1rem;
+      --chrome-safe: 2.85rem;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 900px) and (orientation: portrait) {
+    :root {
+      --stack-max: min(28rem, 92vw);
+      --fs-title: clamp(1.45rem, 1.1rem + 1.2vw, 1.75rem);
+    }
+  }
+}
+
+@layer components {
+  .shell {
+    @apply relative min-h-screen bg-background text-foreground;
+  }
+
+  .chrome {
+    @apply fixed top-0 right-0 z-20;
+    padding: calc(0.45rem + env(safe-area-inset-top, 0px))
+      calc(0.45rem + env(safe-area-inset-right, 0px)) 0.45rem 0.45rem;
+  }
+
+  .chrome__actions {
+    @apply flex items-center gap-0.5;
+  }
+
+  .chrome__btn {
+    @apply relative shrink-0 gap-1;
+    width: auto !important;
+    min-width: 2.5rem;
+    height: 2.5rem !important;
+    padding-inline: 0.55rem !important;
+  }
+
+  .chrome__locale {
+    font-size: 0.62rem;
+    @apply font-semibold tracking-wider uppercase;
+    line-height: 1;
+  }
+
+  .page {
+    @apply min-h-screen flex flex-col items-center;
+    padding: calc(var(--space-page-y) + var(--chrome-safe)) var(--space-page-x)
+      var(--space-page-y);
+  }
+
+  .page--results {
+    padding-top: calc(var(--space-page-y) + var(--chrome-safe));
+  }
+
+  .page__stack {
+    @apply flex flex-col items-stretch w-full;
+    flex: 1 1 auto;
+    justify-content: center;
+    max-width: var(--stack-max);
+    gap: var(--space-section);
+  }
+
+  .page--results .page__stack {
+    justify-content: flex-start;
+  }
+
+  .hero {
+    @apply grid gap-1.5 text-center w-full;
+  }
+
+  .page__title {
+    margin: 0;
+    font-size: var(--fs-title);
+    @apply font-semibold tracking-tight;
+  }
+
+  .page__lead {
+    margin: 0;
+    font-size: var(--fs-lead);
+    @apply text-muted-foreground leading-relaxed;
+  }
+
+  /* Vertical stepper: continuous rail + content cards */
+  .steps {
+    --step-rail: 1.75rem;
+    --step-gap: 0.55rem;
+    @apply relative m-0 list-none p-0 grid;
+    gap: var(--step-gap);
+  }
+
+  .step {
+    @apply relative m-0 grid items-stretch;
+    grid-template-columns: var(--step-rail) minmax(0, 1fr);
+    gap: 0.65rem;
+    min-height: 3.1rem;
+  }
+
+  .step__rail {
+    @apply relative flex justify-center;
+  }
+
+  .step:not(:last-child) .step__rail::after {
+    content: "";
+    position: absolute;
+    top: 1.75rem;
+    bottom: calc(-1 * var(--step-gap));
+    left: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background: color-mix(in oklab, var(--border) 90%, transparent);
+  }
+
+  .step--ready:not(:last-child) .step__rail::after {
+    background: color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+
+  .step__node {
+    @apply relative z-[1] flex size-7 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-semibold tabular-nums text-muted-foreground;
+    font-size: var(--fs-hint);
+  }
+
+  .step--ready .step__node {
+    @apply border-primary bg-primary text-primary-foreground;
+  }
+
+  .step__card {
+    @apply relative flex min-w-0 items-center gap-2 cursor-pointer border border-dashed border-border bg-card shadow-xs transition-colors;
+    border-radius: var(--radius);
+    padding: 0.5rem 0.65rem;
+  }
+
+  .step__card:hover {
+    @apply border-ring;
+  }
+
+  .step__card:focus-within {
+    @apply border-ring outline-none ring-2 ring-ring/30;
+  }
+
+  .step--ready .step__card {
+    @apply border-solid border-primary/50 bg-primary/5;
+  }
+
+  .step__input {
+    @apply absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0;
+  }
+
+  .step__meta {
+    @apply relative z-0 min-w-0 flex-1 grid gap-0;
+  }
+
+  .step__label {
+    font-size: var(--fs-label);
+    @apply font-medium uppercase tracking-wide text-muted-foreground leading-tight;
+  }
+
+  .step__hint {
+    font-size: var(--fs-hint);
+    @apply font-normal text-muted-foreground leading-tight;
+  }
+
+  .step__sep {
+    @apply mx-1 opacity-60;
+  }
+
+  .step__name {
+    font-size: var(--fs-body);
+    @apply font-medium truncate text-card-foreground leading-tight;
+  }
+
+  .step__status {
+    @apply relative z-0 shrink-0 flex flex-col items-center justify-center gap-0 min-w-9;
+  }
+
+  .step__dot {
+    @apply block size-1.5 rounded-full bg-muted-foreground/35;
+  }
+
+  .step__check {
+    @apply text-primary;
+  }
+
+  .step__ready {
+    font-size: var(--fs-hint);
+    @apply font-semibold text-primary leading-none;
+  }
+
+  .actions {
+    @apply flex flex-wrap justify-center items-center gap-2 w-full;
+  }
+
+  .actions > * {
+    @apply min-w-0;
+  }
+
+  .stats {
+    @apply flex flex-wrap justify-center gap-2 w-full;
+  }
+
+  .error {
+    @apply m-0 text-center text-destructive;
+    font-size: var(--fs-body);
+  }
+
+  .results h2 {
+    @apply mt-3 mb-2 font-semibold;
+    font-size: var(--fs-body);
+  }
+
+  .empty {
+    @apply m-0 text-muted-foreground;
+    font-size: var(--fs-label);
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto border border-border bg-card;
+    border-radius: var(--radius);
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ledger {
+    @apply w-full border-collapse;
+    font-size: var(--fs-label);
+  }
+
+  .ledger th,
+  .ledger td {
+    @apply px-2.5 py-2 border-b border-border text-left align-top;
+  }
+
+  .ledger th {
+    @apply text-muted-foreground font-semibold bg-muted/60;
+  }
+
+  .ledger .num {
+    @apply tabular-nums whitespace-nowrap;
+  }
+
+  .site-footer {
+    @apply grid justify-items-center gap-1.5 text-center w-full shrink-0;
+    max-width: var(--stack-max);
+    margin-top: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    padding-top: 0.75rem;
+  }
+
+  .site-footer__note {
+    margin: 0;
+    max-width: 22rem;
+    font-size: var(--fs-footer);
+    line-height: 1.45;
+    @apply text-muted-foreground/80;
+  }
+
+  .site-footer__clear {
+    @apply appearance-none border-0 bg-transparent p-0 cursor-pointer text-muted-foreground underline-offset-2 hover:text-foreground hover:underline;
+    font: inherit;
+    font-size: var(--fs-footer);
+  }
+
+  @media (max-width: 374px) {
+    .actions {
+      @apply flex-col items-stretch;
+    }
+
+    .chrome__btn {
+      min-width: 2.25rem;
+      height: 2.25rem !important;
+      padding-inline: 0.4rem !important;
+    }
+
+    .steps {
+      --step-rail: 1.5rem;
+      --step-gap: 0.45rem;
+    }
+
+    .step {
+      gap: 0.5rem;
+      min-height: 2.85rem;
+    }
+
+    .step__node {
+      @apply size-6;
+    }
+
+    .step:not(:last-child) .step__rail::after {
+      top: 1.5rem;
+    }
+
+    .step__card {
+      padding: 0.4rem 0.5rem;
+      gap: 0.4rem;
+    }
+
+    .step__status {
+      @apply min-w-8;
+    }
+  }
+}

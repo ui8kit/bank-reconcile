@@ -1,0 +1,36 @@
+{
+  "name": "@ui8kit/bank",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Browser-only bank statement reconciler (Bun + Svelte 5 + ui8kit).",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sync:ui8kit": "bash ./scripts/sync-ui8kit.sh",
+    "check": "tsc -p tsconfig.json --noEmit && svelte-check --tsconfig ./tsconfig.json",
+    "test": "bun test",
+    "samples": "bun run ./scripts/generate-samples.ts"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-svelte": "^1.0.1",
+    "pdfjs-dist": "^6.2.108",
+    "tailwind-merge": "^3.5.0"
+  },
+  "devDependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
+    "@playwright/test": "^1.61.1",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
+    "@tailwindcss/vite": "^4.3.3",
+    "@tsconfig/svelte": "^5.0.4",
+    "pdf-lib": "^1.17.1",
+    "svelte": "^5.19.0",
+    "svelte-check": "^4.1.4",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  },
+  "packageManager": "bun@1.3.3"
+}
