@@ -1,5 +1,9 @@
 # Simpla Bank Reconcile
 
+> **npm:** install/build without Bun — use branch
+> [`npm`](https://github.com/ui8kit/bank-reconcile/tree/npm)
+> (`npm install` · Vitest · `package-lock.json`). This default tree stays Bun-friendly.
+
 **Starter** for browser-only bank statement matching — clone it, drop in *your*
 bank PDF + income/expense reports, then ask an LLM (or edit by hand) to adapt
 the parser to that layout.
