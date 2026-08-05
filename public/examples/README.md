@@ -5,6 +5,7 @@ Each subdirectory is one bank adapter id (see `src/lib/reconcile/adapters/`).
 | Folder | Adapter | Notes |
 |--------|---------|--------|
 | [`psb/`](psb/) | Promsvyazbank | Statement + income/expense reports |
+| [`alexs/`](alexs/) | Alexs | Debit/credit column PDF + ODS reports |
 
 Demo samples (generic adapter) live in [`../samples/`](../samples/).
 

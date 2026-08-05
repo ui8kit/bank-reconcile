@@ -126,7 +126,7 @@ loadLedgerFile(file, side, { adapter })
 - Report-side adapters (`parseIncome` / `parseExpense`) when CSVs also diverge
 - Confidence UI (“detected as PSB 0.82”) for Auto mode
 - Shared amount/date token utilities extracted further (DRY without merging bank rules)
-- Additional banks (e.g. client-specific column PDF layouts)
+- Additional banks beyond `psb` / `alexs` as new client layouts appear
 
 ## Prompt contract for future adapter PRs
 

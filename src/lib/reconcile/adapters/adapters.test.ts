@@ -3,8 +3,10 @@ import { readFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import { rowsFromCsv } from "../parse"
+import { rowsFromOds } from "../ods"
 import { reconcile } from "../match"
 import {
+  alexsAdapter,
   detectAdapter,
   genericAdapter,
   listAdapters,
@@ -15,12 +17,14 @@ import {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../")
 const samplesDir = path.join(root, "public/samples")
 const psbDir = path.join(root, "public/examples/psb")
+const alexsDir = path.join(root, "public/examples/alexs")
 
 describe("adapter registry", () => {
-  test("lists generic and psb", () => {
+  test("lists generic, psb, alexs", () => {
     const ids = listAdapters().map((a) => a.id)
     expect(ids).toContain("generic")
     expect(ids).toContain("psb")
+    expect(ids).toContain("alexs")
   })
 
   test("detects PSB markers", () => {
@@ -28,6 +32,12 @@ describe("adapter registry", () => {
     expect(detectAdapter(text, { fileName: "bank.txt" }).id).toBe("psb")
     expect(resolveAdapter("auto", text, { fileName: "x.txt" }).id).toBe("psb")
     expect(resolveAdapter("generic", text, { fileName: "x.txt" }).id).toBe("generic")
+  })
+
+  test("detects alexs debit/credit layout (not PSB)", () => {
+    const text = readFileSync(path.join(alexsDir, "bank.txt"), "utf8")
+    expect(detectAdapter(text, { fileName: "Выписка.pdf" }).id).toBe("alexs")
+    expect(psbAdapter.detect?.(text, { fileName: "Выписка.pdf" }) ?? 0).toBe(0)
   })
 
   test("falls back to generic for demo samples", () => {
@@ -96,5 +106,53 @@ describe("psb adapter + examples", () => {
     )
     expect(rows).toHaveLength(1)
     expect(rows[0]!.amount).toBe(125000)
+  })
+})
+
+describe("alexs adapter + examples", () => {
+  test("strips document number from spaced thousands", () => {
+    const rows = alexsAdapter.parseBank(
+      [
+        "Дата Номер Дебет Кредит Назначение платежа Документ",
+        "04.05.2026 14",
+        "600 000,00 Платежное поручение",
+        "29.05.2026 481 101 300,00 Платежное поручение",
+        "13.05.2026 174",
+        "510,00 Платежное поручение",
+      ].join("\n"),
+      "alexs.txt",
+    )
+    expect(rows.map((r) => r.amount).sort((a, b) => a - b)).toEqual([510, 101300, 600000])
+  })
+
+  test("golden reconcile counts with ODS reports", async () => {
+    const bank = alexsAdapter.parseBank(
+      readFileSync(path.join(alexsDir, "bank.txt"), "utf8"),
+      "bank.txt",
+    )
+    const incomeBuf = readFileSync(path.join(alexsDir, "income.ods"))
+    const expenseBuf = readFileSync(path.join(alexsDir, "expense.ods"))
+    const income = await rowsFromOds(
+      incomeBuf.buffer.slice(incomeBuf.byteOffset, incomeBuf.byteOffset + incomeBuf.byteLength),
+      "income",
+      "income.ods",
+    )
+    const expense = await rowsFromOds(
+      expenseBuf.buffer.slice(expenseBuf.byteOffset, expenseBuf.byteOffset + expenseBuf.byteLength),
+      "expense",
+      "expense.ods",
+    )
+    const result = reconcile(bank, income, expense)
+
+    expect(bank.length).toBe(139)
+    expect(income.length).toBe(41)
+    expect(expense.length).toBe(104)
+    expect(result.matched.length).toBe(109)
+    expect(result.unmatchedIncome.length).toBe(18)
+    expect(result.unmatchedExpense.length).toBe(18)
+    expect(result.unmatchedBank.length).toBe(30)
+
+    expect(result.unmatchedIncome.every((r) => /^РН$/i.test(r.purpose.trim()))).toBe(true)
+    expect(result.unmatchedExpense.every((r) => /возм/i.test(r.purpose))).toBe(true)
   })
 })

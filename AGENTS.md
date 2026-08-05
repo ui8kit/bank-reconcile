@@ -76,7 +76,7 @@ Run bun test && bun run build.
 
 | Path | Touch when… |
 |------|-------------|
-| `src/lib/reconcile/adapters/` | New bank layout (`generic`, `psb`, …) + registry |
+| `src/lib/reconcile/adapters/` | New bank layout (`generic`, `psb`, `alexs`, …) + registry |
 | `src/lib/reconcile/parse.ts` | Shared date/amount/CSV helpers (not bank-specific rules) |
 | `src/lib/reconcile/pdf.ts` | PDF columns / Y-clustering / space gaps between spans |
 | `src/lib/reconcile/ods.ts` | ODS (ZIP+content.xml) report tables — core format support |

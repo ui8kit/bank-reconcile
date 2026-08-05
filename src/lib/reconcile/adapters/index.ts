@@ -1,15 +1,17 @@
+import { alexsAdapter } from "./alexs"
 import { genericAdapter } from "./generic"
 import { psbAdapter } from "./psb"
 import type { AdapterChoice, AdapterDetectMeta, BankAdapter } from "./types"
 
 export type { AdapterChoice, AdapterDetectMeta, BankAdapter } from "./types"
+export { alexsAdapter } from "./alexs"
 export { genericAdapter } from "./generic"
 export { psbAdapter } from "./psb"
 
 const DETECT_THRESHOLD = 0.5
 
 /** Registered bank adapters (order = detect scan order). */
-export const adapters: BankAdapter[] = [psbAdapter, genericAdapter]
+export const adapters: BankAdapter[] = [alexsAdapter, psbAdapter, genericAdapter]
 
 const byId = new Map(adapters.map((a) => [a.id, a]))
 

@@ -41,7 +41,14 @@
     { value: "auto", label: t.adapterAuto },
     ...listAdapters().map((a) => ({
       value: a.id,
-      label: a.id === "psb" ? t.adapterPsb : a.id === "generic" ? t.adapterGeneric : a.label,
+      label:
+        a.id === "psb"
+          ? t.adapterPsb
+          : a.id === "alexs"
+            ? t.adapterAlexs
+            : a.id === "generic"
+              ? t.adapterGeneric
+              : a.label,
     })),
   ])
   const canRun = $derived(
@@ -152,6 +159,7 @@
   function adapterLabel(id: string | null): string {
     if (!id) return ""
     if (id === "psb") return t.adapterPsb
+    if (id === "alexs") return t.adapterAlexs
     if (id === "generic") return t.adapterGeneric
     return listAdapters().find((a) => a.id === id)?.label ?? id
   }

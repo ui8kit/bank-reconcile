@@ -51,8 +51,11 @@ function scorePair(
   // Allow amount+date match with weak purpose when dates equal and amounts exact
   const exactAmount = Math.abs(Math.abs(bank.amount) - Math.abs(report.amount)) < 0.005
   const sameDay = days === 0
+  const purposeSparse =
+    purposeTokens(bank.purpose).size === 0 || purposeTokens(report.purpose).size === 0
   if (ratio < opts.purposeMinOverlap && !(exactAmount && sameDay && ratio >= 0.15)) {
-    if (!(exactAmount && sameDay && shared.length >= 1)) return null
+    // Sparse PDF purposes (doc-type only) still match on exact amount + same day.
+    if (!(exactAmount && sameDay && (shared.length >= 1 || purposeSparse))) return null
   }
 
   let score = 0

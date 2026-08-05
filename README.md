@@ -27,8 +27,9 @@ Try fixtures first:
 |--------|---------|------|
 | [`public/samples/`](public/samples/) | `generic` | Synthetic demo (known expected unmatched) |
 | [`public/examples/psb/`](public/examples/psb/) | `psb` | Promsvyazbank statement + aligned reports |
+| [`public/examples/alexs/`](public/examples/alexs/) | `alexs` | Debit/credit PDF + ODS income/expense |
 
-Bank layout is chosen in the UI: **Auto-detect / Generic / Promsvyazbank**.
+Bank layout is chosen in the UI: **Auto-detect / Generic / Promsvyazbank / Alexs**.
 
 ## Adapt to another bank (typical vibe-coder path)
 
