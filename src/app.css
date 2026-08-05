@@ -257,6 +257,61 @@
     font-size: var(--fs-body);
   }
 
+  .results__sum {
+    @apply font-normal text-muted-foreground tabular-nums;
+  }
+
+  .results__hint {
+    @apply m-0 mb-2 text-destructive;
+    font-size: var(--fs-hint);
+  }
+
+  .results--miss .table-wrap {
+    border-color: color-mix(in oklab, var(--color-destructive) 45%, var(--color-border));
+  }
+
+  .totals {
+    @apply grid gap-2 w-full;
+  }
+
+  .totals h2 {
+    @apply m-0 font-semibold;
+    font-size: var(--fs-body);
+  }
+
+  .totals__grid {
+    @apply grid gap-2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 420px) {
+    .totals__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .totals__card {
+    @apply grid gap-1 border border-border bg-card px-3 py-2.5;
+    border-radius: var(--radius);
+    font-size: var(--fs-label);
+  }
+
+  .totals__label {
+    @apply font-semibold;
+  }
+
+  .totals__line {
+    @apply tabular-nums text-muted-foreground;
+  }
+
+  .totals__line--ok {
+    color: color-mix(in oklab, var(--color-foreground) 80%, #3d8b5f);
+  }
+
+  .totals__line--miss {
+    @apply text-destructive font-medium;
+  }
+
   .empty {
     @apply m-0 text-muted-foreground;
     font-size: var(--fs-label);
@@ -284,6 +339,14 @@
 
   .ledger .num {
     @apply tabular-nums whitespace-nowrap;
+  }
+
+  .ledger__row--miss td {
+    background: color-mix(in oklab, var(--color-destructive) 12%, transparent);
+  }
+
+  .ledger__row--miss td:first-child {
+    border-left: 3px solid var(--color-destructive);
   }
 
   .site-footer {

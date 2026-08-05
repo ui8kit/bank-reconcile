@@ -47,15 +47,20 @@ function scorePair(
   const days = daysApart(bank.date, report.date)
   if (days > opts.dateWindowDays) return null
 
-  const { ratio, shared } = purposeOverlap(bank.purpose, report.purpose)
-  // Allow amount+date match with weak purpose when dates equal and amounts exact
   const exactAmount = Math.abs(Math.abs(bank.amount) - Math.abs(report.amount)) < 0.005
   const sameDay = days === 0
-  const purposeSparse =
-    purposeTokens(bank.purpose).size === 0 || purposeTokens(report.purpose).size === 0
-  if (ratio < opts.purposeMinOverlap && !(exactAmount && sameDay && ratio >= 0.15)) {
-    // Sparse PDF purposes (doc-type only) still match on exact amount + same day.
-    if (!(exactAmount && sameDay && (shared.length >= 1 || purposeSparse))) return null
+  const ignorePurpose = opts.purposeMinOverlap <= 0
+
+  let ratio = 0
+  let shared: string[] = []
+  if (!ignorePurpose) {
+    ;({ ratio, shared } = purposeOverlap(bank.purpose, report.purpose))
+    const purposeSparse =
+      purposeTokens(bank.purpose).size === 0 || purposeTokens(report.purpose).size === 0
+    if (ratio < opts.purposeMinOverlap && !(exactAmount && sameDay && ratio >= 0.15)) {
+      // Sparse PDF purposes (doc-type only) still match on exact amount + same day.
+      if (!(exactAmount && sameDay && (shared.length >= 1 || purposeSparse))) return null
+    }
   }
 
   let score = 0
@@ -64,9 +69,14 @@ function scorePair(
   reasons.push(exactAmount ? "amount exact" : `amount ±${opts.amountTolerance}`)
   score += sameDay ? 30 : 20
   reasons.push(sameDay ? "same day" : `date ±${days}d`)
-  score += Math.round(ratio * 20)
-  if (shared.length) reasons.push(`purpose: ${shared.slice(0, 4).join(", ")}`)
-  else reasons.push("purpose weak")
+  if (ignorePurpose) {
+    score += 10
+    reasons.push("purpose ignored")
+  } else {
+    score += Math.round(ratio * 20)
+    if (shared.length) reasons.push(`purpose: ${shared.slice(0, 4).join(", ")}`)
+    else reasons.push("purpose weak")
+  }
   return { score, reasons }
 }
 
@@ -98,19 +108,26 @@ export function reconcile(
     for (const r of reports) {
       const hit = scorePair(b, r, opts)
       if (!hit) {
-        // near miss: amount ok, date within 2 days, purpose weak
+        // near miss: amount ok, date within 2 days
         if (
           amountsClose(b.amount, r.amount, opts.amountTolerance) &&
           daysApart(b.date, r.date) <= opts.dateWindowDays + 1
         ) {
-          const { ratio, shared } = purposeOverlap(b.purpose, r.purpose)
+          const ignorePurpose = opts.purposeMinOverlap <= 0
+          const { ratio, shared } = ignorePurpose
+            ? { ratio: 0, shared: [] as string[] }
+            : purposeOverlap(b.purpose, r.purpose)
           nearMisses.push({
             bank: b,
             candidate: r,
-            score: Math.round(ratio * 100),
+            score: ignorePurpose ? 50 : Math.round(ratio * 100),
             reasons: [
               `date ±${daysApart(b.date, r.date)}d`,
-              shared.length ? `tokens ${shared.slice(0, 3).join(",")}` : "purpose low",
+              ignorePurpose
+                ? "purpose ignored"
+                : shared.length
+                  ? `tokens ${shared.slice(0, 3).join(",")}`
+                  : "purpose low",
             ],
           })
         }

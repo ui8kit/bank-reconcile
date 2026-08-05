@@ -11,23 +11,22 @@ Use bank adapter **Auto** or **Alexs**.
 
 Adapter: `src/lib/reconcile/adapters/alexs.ts`
 
-## Expected reconcile (default matcher)
+## Matching rules (alexs)
 
-Approx. counts from the bundled fixtures:
+- **Amount + date ±1 day only** — purpose text is not used for match score.
+- **Возм**: parse `К.611.22` from purpose; **add K. to the bank settlement**
+  (`32788.78 + 611.22 → 33400`) to pair with cash/РН income; also emit a fee
+  leg `amount = K.` to pair with expense Возм commission.
+
+## Expected reconcile (bundled fixtures)
 
 | Metric | Count | Notes |
 |--------|------:|-------|
-| bank rows | **139** | Doc№ stripped from amounts |
-| income rows | **41** | ODS `Приход` column |
-| expense rows | **104** | ODS `Расход` column |
-| matched | **~109** | amount + same day (sparse PDF purpose OK) |
-| unmatched income | **18** | ККТ / `РН` cash — not on bank statement |
-| unmatched expense | **18** | `Возм` commission (`К.`) vs bank gross debit |
-| unmatched bank | **~30** | bank-only lines + `Возм` gross amounts |
+| bank rows (raw → prepared) | **139 → 157** | +18 Возм fee legs |
+| income / expense | **41 / 104** | ODS Приход / Расход |
+| matched | **143** | 39 income + 104 expense |
+| unmatched income | **2** | РН without bank+К. counterpart |
+| unmatched expense | **0** | |
+| unmatched bank | **14** | taxes, transfers, 2 orphan Возм totals |
 
-### Parser notes
-
-- After the date, the next integer is the payment **document number** — never glue it into spaced thousands (`14` + `600 000,00` → `600 000`).
-- Skip page headers (`Контрагент`, `Дата Номер Дебет…`).
-- Ignore `К.912,26`-style fee fragments when a larger debit/credit amount is present.
-- Redact PII before publishing copies of these files.
+Redact PII before publishing copies of these files.

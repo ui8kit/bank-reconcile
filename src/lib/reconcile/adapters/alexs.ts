@@ -17,10 +17,18 @@ const ALEXS_LAYOUT_RE =
 /**
  * Client statement layout: columns Date | Doc№ | Debit/Credit | Purpose | Doc type.
  * PDF text often wraps so doc number sits on the date line and the amount on the next.
+ *
+ * Возм lines: add K.fee to the settlement amount (matches cash/РН income) and emit a
+ * separate fee leg equal to K. (matches expense Возм commission). Match ignores purpose.
  */
 export const alexsAdapter: BankAdapter = {
   id: "alexs",
   label: "Alexs",
+  matchOptions: {
+    purposeMinOverlap: 0,
+    dateWindowDays: 1,
+    amountTolerance: 0.05,
+  },
   detect(text, meta) {
     let score = 0
     const name = meta.fileName.toLowerCase()
@@ -37,6 +45,51 @@ export const alexsAdapter: BankAdapter = {
   parseBank(text, sourceFile) {
     return parseAlexsBank(text, sourceFile)
   },
+  prepareBankRows(rows) {
+    return applyAlexsVozmRules(rows)
+  },
+}
+
+/** Parse `К.611.22` / `К. 611,22` from Возм purpose/raw. */
+export function extractVozmK(text: string): number | null {
+  const m = text.match(/К\.\s*(\d{1,3}(?:[ \u00a0]\d{3})*[.,]\d{2}|\d+[.,]\d{2})/i)
+  if (!m) return null
+  return parseAmount(m[1]!)
+}
+
+/**
+ * For each Возм bank row with K.:
+ * - main amount becomes settlement + K. (cash total)
+ * - extra row carries K. alone for expense commission matching
+ */
+export function applyAlexsVozmRules(rows: LedgerRow[]): LedgerRow[] {
+  const out: LedgerRow[] = []
+  for (const row of rows) {
+    const blob = `${row.purpose} ${row.raw}`
+    if (!/возм/i.test(blob)) {
+      out.push(row)
+      continue
+    }
+    const k = extractVozmK(blob)
+    if (k == null || k <= 0) {
+      out.push(row)
+      continue
+    }
+    const total = Number((Math.abs(row.amount) + k).toFixed(2))
+    out.push({
+      ...row,
+      amount: total,
+      purpose: row.purpose ? `${row.purpose} (+К.${k.toFixed(2)})` : `Возм +К.${k.toFixed(2)}`,
+    })
+    out.push({
+      ...row,
+      id: `${row.id}-k`,
+      amount: k,
+      purpose: `Возм К.${k.toFixed(2)}`,
+      lineNo: row.lineNo,
+    })
+  }
+  return out
 }
 
 function coalesceAlexsLines(text: string): string[] {

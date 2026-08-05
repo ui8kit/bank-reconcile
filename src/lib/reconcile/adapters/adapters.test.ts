@@ -125,11 +125,29 @@ describe("alexs adapter + examples", () => {
     expect(rows.map((r) => r.amount).sort((a, b) => a - b)).toEqual([510, 101300, 600000])
   })
 
+  test("Возм adds K. to settlement and emits fee leg", () => {
+    const rows = alexsAdapter.prepareBankRows!(
+      alexsAdapter.parseBank(
+        [
+          "Дата Номер Дебет Кредит Назначение платежа Документ",
+          "07.05.2026 11639",
+          "32 788,78 Возм 17.07.2024 АВТО Р.0026 К.611.22 в т.ч. НДС 110.22 Платежное поручение",
+        ].join("\n"),
+        "v.txt",
+      ),
+    )
+    expect(rows).toHaveLength(2)
+    expect(rows[0]!.amount).toBe(33400)
+    expect(rows[1]!.amount).toBe(611.22)
+    expect(rows[1]!.id.endsWith("-k")).toBe(true)
+  })
+
   test("golden reconcile counts with ODS reports", async () => {
-    const bank = alexsAdapter.parseBank(
+    const bankRaw = alexsAdapter.parseBank(
       readFileSync(path.join(alexsDir, "bank.txt"), "utf8"),
       "bank.txt",
     )
+    const bank = alexsAdapter.prepareBankRows!(bankRaw)
     const incomeBuf = readFileSync(path.join(alexsDir, "income.ods"))
     const expenseBuf = readFileSync(path.join(alexsDir, "expense.ods"))
     const income = await rowsFromOds(
@@ -142,17 +160,17 @@ describe("alexs adapter + examples", () => {
       "expense",
       "expense.ods",
     )
-    const result = reconcile(bank, income, expense)
+    const result = reconcile(bank, income, expense, alexsAdapter.matchOptions)
 
-    expect(bank.length).toBe(139)
+    expect(bankRaw.length).toBe(139)
+    expect(bank.length).toBe(157)
     expect(income.length).toBe(41)
     expect(expense.length).toBe(104)
-    expect(result.matched.length).toBe(109)
-    expect(result.unmatchedIncome.length).toBe(18)
-    expect(result.unmatchedExpense.length).toBe(18)
-    expect(result.unmatchedBank.length).toBe(30)
+    expect(result.matched.length).toBe(143)
+    expect(result.unmatchedIncome.length).toBe(2)
+    expect(result.unmatchedExpense.length).toBe(0)
+    expect(result.unmatchedBank.length).toBe(14)
 
     expect(result.unmatchedIncome.every((r) => /^РН$/i.test(r.purpose.trim()))).toBe(true)
-    expect(result.unmatchedExpense.every((r) => /возм/i.test(r.purpose))).toBe(true)
   })
 })

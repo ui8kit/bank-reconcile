@@ -1,4 +1,4 @@
-import type { LedgerRow } from "../types"
+import type { LedgerRow, MatchOptions } from "../types"
 
 export type AdapterDetectMeta = {
   fileName: string
@@ -15,6 +15,10 @@ export type BankAdapter = {
   /** 0..1 confidence; omit if adapter is select-only */
   detect?: (text: string, meta: AdapterDetectMeta) => number
   parseBank: (text: string, sourceFile: string) => LedgerRow[]
+  /** Optional post-parse bank row rewrite (e.g. Возм → amount+K + fee leg). */
+  prepareBankRows?: (rows: LedgerRow[]) => LedgerRow[]
+  /** Optional reconcile options for this bank layout. */
+  matchOptions?: Partial<MatchOptions>
 }
 
 /** Explicit choice from UI; `auto` uses detect() then falls back to generic. */

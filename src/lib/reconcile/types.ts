@@ -37,6 +37,9 @@ export type MatchOptions = {
   amountTolerance: number
   /** Inclusive day window either side. Default 1 */
   dateWindowDays: number
-  /** Minimum purpose token overlap ratio 0..1. Default 0.35 */
+  /**
+   * Minimum purpose token overlap ratio 0..1. Default 0.35.
+   * Set to 0 to match on amount+date only (ignore purpose).
+   */
   purposeMinOverlap: number
 }

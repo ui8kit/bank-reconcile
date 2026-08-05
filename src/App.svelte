@@ -206,14 +206,22 @@
   </li>
 {/snippet}
 
-{#snippet rowsTable(title: string, rows: LedgerRow[])}
-  <section class="results">
-    <h2>{title} ({rows.length})</h2>
+{#snippet rowsTable(title: string, rows: LedgerRow[], highlight = false)}
+  <section class="results" class:results--miss={highlight && rows.length > 0}>
+    <h2>
+      {title} ({rows.length})
+      {#if rows.length > 0}
+        <span class="results__sum">· {fmtAmount(rows.reduce((a, r) => a + Math.abs(r.amount), 0))}</span>
+      {/if}
+    </h2>
+    {#if highlight && rows.length > 0}
+      <p class="results__hint">{t.highlightUnmatched}</p>
+    {/if}
     {#if rows.length === 0}
       <p class="empty">{t.empty}</p>
     {:else}
       <div class="table-wrap">
-        <table class="ledger">
+        <table class="ledger" class:ledger--miss={highlight}>
           <thead>
             <tr>
               <th>{t.colDate}</th>
@@ -223,7 +231,7 @@
           </thead>
           <tbody>
             {#each rows as row (row.id)}
-              <tr>
+              <tr class:ledger__row--miss={highlight}>
                 <td class="num">{row.date}</td>
                 <td class="num">{fmtAmount(row.amount)}</td>
                 <td>{row.purpose}</td>
@@ -333,9 +341,43 @@
           <Badge variant="outline">{t.statUnmatchedExpense} {counts.unmatchedExpense}</Badge>
         </div>
 
-        {@render rowsTable(t.unmatchedBank, result.unmatchedBank)}
-        {@render rowsTable(t.unmatchedIncome, result.unmatchedIncome)}
-        {@render rowsTable(t.unmatchedExpense, result.unmatchedExpense)}
+        {#if counts.sumIncome != null && counts.sumExpense != null}
+          <section class="totals">
+            <h2>{t.totalsTitle}</h2>
+            <div class="totals__grid">
+              <div class="totals__card">
+                <span class="totals__label">{t.totalsIncome}</span>
+                <span class="totals__line">{t.totalsAll}: {fmtAmount(counts.sumIncome)}</span>
+                <span class="totals__line totals__line--ok"
+                  >{t.totalsMatched}: {fmtAmount(counts.sumMatchedIncome ?? 0)}</span
+                >
+                <span
+                  class="totals__line"
+                  class:totals__line--miss={(counts.sumUnmatchedIncome ?? 0) > 0}
+                >
+                  {t.totalsUnmatched}: {fmtAmount(counts.sumUnmatchedIncome ?? 0)}
+                </span>
+              </div>
+              <div class="totals__card">
+                <span class="totals__label">{t.totalsExpense}</span>
+                <span class="totals__line">{t.totalsAll}: {fmtAmount(counts.sumExpense)}</span>
+                <span class="totals__line totals__line--ok"
+                  >{t.totalsMatched}: {fmtAmount(counts.sumMatchedExpense ?? 0)}</span
+                >
+                <span
+                  class="totals__line"
+                  class:totals__line--miss={(counts.sumUnmatchedExpense ?? 0) > 0}
+                >
+                  {t.totalsUnmatched}: {fmtAmount(counts.sumUnmatchedExpense ?? 0)}
+                </span>
+              </div>
+            </div>
+          </section>
+        {/if}
+
+        {@render rowsTable(t.unmatchedIncome, result.unmatchedIncome, true)}
+        {@render rowsTable(t.unmatchedExpense, result.unmatchedExpense, true)}
+        {@render rowsTable(t.unmatchedBank, result.unmatchedBank, false)}
 
         {#if result.matched.length > 0}
           <section class="results">

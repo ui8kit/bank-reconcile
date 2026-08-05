@@ -79,12 +79,13 @@ export async function runReconcile(
     fileName: files.bank.name,
   })
 
-  const [bank, income, expense] = await Promise.all([
+  const [bankRaw, income, expense] = await Promise.all([
     loadLedgerFile(files.bank, "bank", { adapter: adapter.id }),
     loadLedgerFile(files.income, "income"),
     loadLedgerFile(files.expense, "expense"),
   ])
-  const result = reconcile(bank, income, expense)
+  const bank = adapter.prepareBankRows ? adapter.prepareBankRows(bankRaw) : bankRaw
+  const result = reconcile(bank, income, expense, adapter.matchOptions)
   return {
     result,
     adapterId: adapter.id,
@@ -96,8 +97,22 @@ export async function runReconcile(
       unmatchedBank: result.unmatchedBank.length,
       unmatchedIncome: result.unmatchedIncome.length,
       unmatchedExpense: result.unmatchedExpense.length,
+      sumIncome: sumAbs(income),
+      sumExpense: sumAbs(expense),
+      sumUnmatchedIncome: sumAbs(result.unmatchedIncome),
+      sumUnmatchedExpense: sumAbs(result.unmatchedExpense),
+      sumMatchedIncome: sumAbs(
+        result.matched.filter((m) => m.report.side === "income").map((m) => m.report),
+      ),
+      sumMatchedExpense: sumAbs(
+        result.matched.filter((m) => m.report.side === "expense").map((m) => m.report),
+      ),
     },
   }
+}
+
+function sumAbs(rows: LedgerRow[]): number {
+  return Number(rows.reduce((a, r) => a + Math.abs(r.amount), 0).toFixed(2))
 }
 
 export function downloadUnmatchedCsv(result: ReconcileResult, filename = "unmatched.csv") {
