@@ -80,6 +80,7 @@ Add bun tests for a few lines from this PDF. Run bun test && bun run build.
 |------|-------------|
 | `src/lib/reconcile/parse.ts` | Dates/amounts/purpose wrong; CSV headers; line wrapping |
 | `src/lib/reconcile/pdf.ts` | PDF columns / Y-clustering / space gaps between spans |
+| `src/lib/reconcile/ods.ts` | ODS (ZIP+content.xml) report tables — core format support |
 | `src/lib/reconcile/match.ts` | Fuzzy windows (amount/date/purpose) — change rarely |
 | `src/lib/reconcile/index.ts` | File-type routing into parse |
 | `src/lib/reconcile/*.test.ts` | Golden lines for the bank you are adapting |

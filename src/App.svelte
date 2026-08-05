@@ -136,7 +136,7 @@
         id={id}
         class="step__input"
         type="file"
-        accept=".pdf,.csv,.tsv,.txt,application/pdf,text/csv,text/plain"
+        accept=".pdf,.csv,.tsv,.txt,.ods,application/pdf,text/csv,text/plain,application/vnd.oasis.opendocument.spreadsheet"
         onchange={(e) => pick(kind, (e.currentTarget as HTMLInputElement).files)}
       />
       <div class="step__meta">

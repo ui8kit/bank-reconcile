@@ -4,7 +4,7 @@
   "uploadBank": "Bank statement",
   "uploadIncome": "Income report",
   "uploadExpense": "Expense report",
-  "uploadHint": "PDF, CSV or TXT",
+  "uploadHint": "PDF, CSV, ODS or TXT",
   "uploadReady": "Loaded",
   "uploadEmpty": "Choose file",
   "privacyNote": "All matching runs locally in this tab. Files never leave your device.",

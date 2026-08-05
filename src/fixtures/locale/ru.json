@@ -4,7 +4,7 @@
   "uploadBank": "Выписка банка",
   "uploadIncome": "Отчёт о доходах",
   "uploadExpense": "Отчёт о расходах",
-  "uploadHint": "PDF, CSV или TXT",
+  "uploadHint": "PDF, CSV, ODS или TXT",
   "uploadReady": "Загружен",
   "uploadEmpty": "Выбрать файл",
   "privacyNote": "Сверка только в этой вкладке. Файлы не покидают устройство.",
