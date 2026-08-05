@@ -49,27 +49,21 @@ bun run sync:ui8kit   # refresh vendored ui8kit from codegen
 | EN/RU strings | `src/fixtures/locale/en.json`, `ru.json` |
 | Theme tokens / fonts | `src/theme.css`, `src/fonts.css`, `public/fonts/` |
 | Demo fixtures | `src/fixtures/samples/ledger.json` → `bun run samples` |
-| Real-statement examples | `public/examples/` (later `public/examples/<bank-id>/`) |
+| Real-statement examples | `public/examples/<bank-id>/` |
 | ui8kit primitives | **do not hand-edit** — use `bun run sync:ui8kit` |
 | Vercel routing / headers | `vercel.json` |
-| Future architecture plans | `.project/plan/` |
+| Architecture plans | `.project/plan/` |
 
 ## Adding support for another bank
 
-Today the safe contribution is a **focused parser fix** plus fixtures/tests for
-that statement (see [AGENTS.md](AGENTS.md) vibe-coder mission).
-
-When multiple banks must coexist without breaking `generic` / `samples`, follow
-the adapter plan:
+Follow the adapter plan (Phase 1+2 are in place):
 
 - Plan: [`.project/plan/bank-adapters.md`](.project/plan/bank-adapters.md)
 - Contract: adapters emit only `LedgerRow[]`; `match.ts` and UI stay bank-agnostic
 - Layout: `src/lib/reconcile/adapters/<id>.ts` + `public/examples/<id>/`
 - Detection order: explicit UI select → heuristic `detect` → fallback `generic`
+- Do **not** invent a second component tree per bank
 - Prompt contract for adapter PRs is in the plan file
-
-Until Phase 1 exists, do **not** invent a second component tree per bank. Prefer
-a named helper or a clean branch on `rowsFromText` plus golden tests.
 
 ## PR guidelines
 

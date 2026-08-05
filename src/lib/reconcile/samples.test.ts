@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import ledger from "../../fixtures/samples/ledger.json"
-import { rowsFromCsv, rowsFromText } from "./parse"
+import { genericAdapter } from "./adapters"
+import { rowsFromCsv } from "./parse"
 import { reconcile } from "./match"
 
 const samplesDir = path.resolve(
@@ -16,7 +17,7 @@ function loadSamples() {
   const incomeCsv = readFileSync(path.join(samplesDir, "income.csv"), "utf8")
   const expenseCsv = readFileSync(path.join(samplesDir, "expense.csv"), "utf8")
   return {
-    bank: rowsFromText(bankTxt, "bank", "bank.txt"),
+    bank: genericAdapter.parseBank(bankTxt, "bank.txt"),
     income: rowsFromCsv(incomeCsv, "income", "income.csv"),
     expense: rowsFromCsv(expenseCsv, "expense", "expense.csv"),
   }

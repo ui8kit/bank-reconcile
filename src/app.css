@@ -97,6 +97,27 @@
     @apply grid gap-1.5 text-center w-full;
   }
 
+  .adapter {
+    @apply flex flex-col gap-1.5 w-full;
+  }
+
+  .adapter__label {
+    font-size: var(--fs-label);
+    @apply font-medium text-muted-foreground tracking-wide uppercase;
+  }
+
+  .adapter__select {
+    @apply w-full rounded-md border border-border bg-background text-foreground;
+    font-size: var(--fs-body);
+    padding: 0.55rem 0.75rem;
+    min-height: 2.5rem;
+  }
+
+  .adapter__select:focus {
+    outline: 2px solid color-mix(in oklab, var(--color-ring) 70%, transparent);
+    outline-offset: 1px;
+  }
+
   .page__title {
     margin: 0;
     font-size: var(--fs-title);

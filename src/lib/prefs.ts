@@ -1,10 +1,13 @@
 const THEME_KEY = "bank-theme"
 const LOCALE_KEY = "bank-locale"
+const ADAPTER_KEY = "bank-adapter"
 
 /** Fresh visits default to English; stored preference wins after first toggle. */
 export const DEFAULT_LOCALE = "en" as const
+export const DEFAULT_ADAPTER = "auto" as const
 
 export type ThemeMode = "light" | "dark"
+export type StoredAdapterChoice = "auto" | "generic" | "psb" | string
 
 export function readStoredTheme(fallback: ThemeMode = "dark"): ThemeMode {
   try {
@@ -42,4 +45,23 @@ export function storeLocale(locale: "en" | "ru") {
     /* ignore */
   }
   document.documentElement.lang = locale === "ru" ? "ru" : "en"
+}
+
+export function readStoredAdapter(
+  fallback: StoredAdapterChoice = DEFAULT_ADAPTER,
+): StoredAdapterChoice {
+  try {
+    const v = localStorage.getItem(ADAPTER_KEY)
+    return v && v.trim() ? v : fallback
+  } catch {
+    return fallback
+  }
+}
+
+export function storeAdapter(choice: StoredAdapterChoice) {
+  try {
+    localStorage.setItem(ADAPTER_KEY, choice)
+  } catch {
+    /* ignore */
+  }
 }

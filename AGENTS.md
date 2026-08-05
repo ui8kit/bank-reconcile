@@ -25,26 +25,24 @@ parsing so Match works for that layout.
 2. **Map columns** to `LedgerRow`: `date` (YYYY-MM-DD), `amount` (signed number),
    `purpose` (string). Ignore headers, totals, running balance when picking amount.
 3. **Patch** only what is needed:
+   - prefer a new/updated adapter under `src/lib/reconcile/adapters/<id>.ts`
    - `src/lib/reconcile/pdf.ts` — line/column reconstruction from pdf.js spans
-   - `src/lib/reconcile/parse.ts` — `rowsFromText` / `coalesceStatementLines` /
-     `pickOperationAmount` / CSV headers
+   - `src/lib/reconcile/parse.ts` — shared amount/date/CSV helpers (keep bank rules out)
    - optional: `loadLedgerFile` in `index.ts` if file type routing changes
 4. **Do not** rewrite the UI, matcher defaults, or add a server unless asked.
+   Do **not** break `adapters/generic.ts` or `public/samples` golden tests.
 5. **Prove** with `bun test` (add 2–3 golden lines from the new statement) and
    `bun run build`. Manually: `bun run dev` → upload 3 files → check unmatched.
 
 ### Copy-paste prompt (for the human)
 
 ```text
-Read AGENTS.md. Adapt this starter to my bank statement.
-
-Statement: public/examples/<file>.pdf
-Income:    public/examples/income.csv
-Expense:   public/examples/expense.csv
-
-Make parse/pdf extract correct date, operation amount (not balance), and purpose
-(including wrapped lines). Keep match.ts fuzzy rules. Stay browser-only.
-Add bun tests for a few lines from this PDF. Run bun test && bun run build.
+Read AGENTS.md and .project/plan/bank-adapters.md.
+Add bank adapter <id> under src/lib/reconcile/adapters/.
+Do not break adapters/generic.ts or public/samples golden tests.
+Put fixtures in public/examples/<id>/ with README expected counts.
+Wire registry detect + UI label. Stay browser-only; output only LedgerRow[].
+Run bun test && bun run build.
 ```
 
 ### Good vs bad adaptations
@@ -78,16 +76,17 @@ Add bun tests for a few lines from this PDF. Run bun test && bun run build.
 
 | Path | Touch when… |
 |------|-------------|
-| `src/lib/reconcile/parse.ts` | Dates/amounts/purpose wrong; CSV headers; line wrapping |
+| `src/lib/reconcile/adapters/` | New bank layout (`generic`, `psb`, …) + registry |
+| `src/lib/reconcile/parse.ts` | Shared date/amount/CSV helpers (not bank-specific rules) |
 | `src/lib/reconcile/pdf.ts` | PDF columns / Y-clustering / space gaps between spans |
 | `src/lib/reconcile/ods.ts` | ODS (ZIP+content.xml) report tables — core format support |
 | `src/lib/reconcile/match.ts` | Fuzzy windows (amount/date/purpose) — change rarely |
-| `src/lib/reconcile/index.ts` | File-type routing into parse |
-| `src/lib/reconcile/*.test.ts` | Golden lines for the bank you are adapting |
-| `src/App.svelte` | Upload UX / results only |
+| `src/lib/reconcile/index.ts` | File-type routing + adapter choice |
+| `src/lib/reconcile/**/*.test.ts` | Golden lines for the bank you are adapting |
+| `src/App.svelte` | Upload UX / adapter select / results only |
 | `src/fixtures/locale/*` | EN/RU copy (default locale **en**) |
-| `public/examples/` | Real or client statement + matching report CSVs |
-| `public/samples/` | Synthetic demos from `src/fixtures/samples/ledger.json` |
+| `public/examples/<id>/` | Per-adapter fixtures + README expected counts |
+| `public/samples/` | Synthetic demos (`generic`) from `ledger.json` |
 | `src/lib/ui8kit/**` | **Never hand-edit** — regenerate via sync script |
 
 ### Target row shape

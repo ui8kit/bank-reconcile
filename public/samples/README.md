@@ -1,6 +1,7 @@
-# Demo samples
+# Demo samples (`generic` adapter)
 
 Generated from `src/fixtures/samples/ledger.json`.
+Use with bank adapter **Auto** or **Generic**.
 
 | File | Role |
 |------|------|

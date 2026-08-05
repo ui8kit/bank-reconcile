@@ -131,10 +131,10 @@
           <li>
             <a
               class="docs__link"
-              href="https://github.com/ui8kit/bank-reconcile/tree/main/public/examples"
+              href="https://github.com/ui8kit/bank-reconcile/tree/main/public/examples/psb"
               target="_blank"
               rel="noopener noreferrer"
-            >public/examples</a>
+            >public/examples/psb</a>
             <span class="docs__hint">{t.docsExamplesHint}</span>
           </li>
         </ul>

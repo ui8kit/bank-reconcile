@@ -7,6 +7,7 @@
   import SiteFooter from "$lib/components/SiteFooter.svelte"
   import {
     downloadUnmatchedCsv,
+    listAdapters,
     runReconcile,
     type LedgerRow,
     type ReconcileResult,
@@ -14,14 +15,18 @@
   import { amountLocale, getDict, nextLocale, type Locale } from "$lib/i18n"
   import {
     applyTheme,
+    readStoredAdapter,
     readStoredLocale,
     readStoredTheme,
+    storeAdapter,
     storeLocale,
+    type StoredAdapterChoice,
     type ThemeMode,
   } from "$lib/prefs"
 
   let locale = $state<Locale>("en")
   let theme = $state<ThemeMode>("dark")
+  let adapterChoice = $state<StoredAdapterChoice>("auto")
   let bankFile = $state<File | null>(null)
   let incomeFile = $state<File | null>(null)
   let expenseFile = $state<File | null>(null)
@@ -29,8 +34,16 @@
   let error = $state<string | null>(null)
   let result = $state<ReconcileResult | null>(null)
   let counts = $state<Record<string, number> | null>(null)
+  let adapterUsed = $state<string | null>(null)
 
   const t = $derived(getDict(locale))
+  const adapterOptions = $derived([
+    { value: "auto", label: t.adapterAuto },
+    ...listAdapters().map((a) => ({
+      value: a.id,
+      label: a.id === "psb" ? t.adapterPsb : a.id === "generic" ? t.adapterGeneric : a.label,
+    })),
+  ])
   const canRun = $derived(
     Boolean(bankFile && incomeFile && expenseFile) && !busy,
   )
@@ -41,6 +54,7 @@
     applyTheme(theme)
     locale = readStoredLocale()
     storeLocale(locale)
+    adapterChoice = readStoredAdapter()
   })
 
   $effect(() => {
@@ -69,6 +83,16 @@
     if (kind === "expense") expenseFile = file
     result = null
     counts = null
+    adapterUsed = null
+    error = null
+  }
+
+  function onAdapterChange(value: string) {
+    adapterChoice = value
+    storeAdapter(value)
+    result = null
+    counts = null
+    adapterUsed = null
     error = null
   }
 
@@ -85,14 +109,19 @@
     error = null
     result = null
     counts = null
+    adapterUsed = null
     try {
-      const out = await runReconcile({
-        bank: bankFile,
-        income: incomeFile,
-        expense: expenseFile,
-      })
+      const out = await runReconcile(
+        {
+          bank: bankFile,
+          income: incomeFile,
+          expense: expenseFile,
+        },
+        { adapter: adapterChoice },
+      )
       result = out.result
       counts = out.counts
+      adapterUsed = out.adapterId
     } catch (e) {
       error = e instanceof Error ? e.message : String(e)
     } finally {
@@ -111,12 +140,20 @@
     expenseFile = null
     result = null
     counts = null
+    adapterUsed = null
     error = null
     busy = false
     for (const id of ["bank-file", "income-file", "expense-file"]) {
       const input = document.getElementById(id)
       if (input instanceof HTMLInputElement) input.value = ""
     }
+  }
+
+  function adapterLabel(id: string | null): string {
+    if (!id) return ""
+    if (id === "psb") return t.adapterPsb
+    if (id === "generic") return t.adapterGeneric
+    return listAdapters().find((a) => a.id === id)?.label ?? id
   }
 </script>
 
@@ -231,6 +268,19 @@
         <Text class="page__lead">{t.appLead}</Text>
       </header>
 
+      <label class="adapter">
+        <span class="adapter__label">{t.adapterLabel}</span>
+        <select
+          class="adapter__select"
+          value={adapterChoice}
+          onchange={(e) => onAdapterChange((e.currentTarget as HTMLSelectElement).value)}
+        >
+          {#each adapterOptions as opt (opt.value)}
+            <option value={opt.value}>{opt.label}</option>
+          {/each}
+        </select>
+      </label>
+
       <ol class="steps">
         {@render uploadCard("bank-file", 1, t.uploadBank, "bank", bankFile)}
         {@render uploadCard("income-file", 2, t.uploadIncome, "income", incomeFile)}
@@ -263,6 +313,9 @@
 
       {#if counts && result}
         <div class="stats">
+          {#if adapterUsed}
+            <Badge variant="outline">{t.adapterUsed}: {adapterLabel(adapterUsed)}</Badge>
+          {/if}
           <Badge variant="secondary">{t.statBank} {counts.bank}</Badge>
           <Badge variant="secondary">{t.statIncome} {counts.income}</Badge>
           <Badge variant="secondary">{t.statExpense} {counts.expense}</Badge>
